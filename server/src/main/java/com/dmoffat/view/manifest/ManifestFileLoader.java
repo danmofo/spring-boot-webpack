@@ -21,10 +21,11 @@ import java.util.HashMap;
 public class ManifestFileLoader {
     private static final Logger logger = LogManager.getLogger(ManifestFileLoader.class);
 
+    private final Resource manifestFile;
+    private final ObjectMapper objectMapper;
+    private final boolean loadOnAccess;
+
     private Manifest manifest;
-    private Resource manifestFile;
-    private ObjectMapper objectMapper;
-    private boolean loadOnAccess;
 
     public ManifestFileLoader(Resource manifestFile,
                               ObjectMapper objectMapper,
@@ -43,13 +44,12 @@ public class ManifestFileLoader {
         return manifest;
     }
 
-    public void load() {
+    private void load() {
         try {
             logger.info("Reading manifest.json.");
             this.manifest = new Manifest(this.objectMapper.readValue(manifestFile.getInputStream(), new TypeReference<HashMap<String, String>>() { }));
         } catch (IOException e) {
-            logger.warn("Unable to load manifest.json file from disk, using an empty map.");
-            this.manifest = new Manifest(new HashMap<>());
+            throw new RuntimeException("Unable to load manifest.json file from disk, due to reason: " + e.getMessage());
         }
     }
 

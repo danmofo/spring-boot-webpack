@@ -100,7 +100,9 @@ module.exports = {
     }),
     new WebpackShellPlugin({
       dev: false,
-      onBuildEnd: ['cp dist/manifest.json ../server/src/main/resources/']
+      // todo: only copy to /resources on build..
+      onBuildEnd: ['cp dist/manifest.json ../server/src/main/resources/',
+                   'cp dist/manifest.json ../server/target/classes/']
     })
 	],
   devServer: {

@@ -6,6 +6,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
+ * Web MVC config for all profiles
+ *
  * @author danielmoffat
  */
 
