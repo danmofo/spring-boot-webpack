@@ -23,8 +23,18 @@ module.exports = {
 		filename: 'scripts/[name].[chunkhash].js',
 		publicPath: '/'
 	},
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    }
+  },
 	module: {
 		rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {}
+      },
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
@@ -105,13 +115,18 @@ module.exports = {
 	],
     devServer: {
         port: 9090,
-        proxy: {
-            '/': {
-                target: 'http://localhost:8080',
-                secure: false,
-                prependPath: false
+        proxy: [{
+          context: '/',
+          target: 'http://localhost:8080/',
+          secure: false
+        }, {
+            context: '/cause/select',
+            target: 'https://www.giveasyoulive.com/cause/select',
+            secure: false,
+            bypass: function(req, res, opts) {
+                req.headers.host = 'www.giveasyoulive.com';
             }
-        },
+        }],
         publicPath: 'http://localhost:9090/',
         historyApiFallback: true
     }
