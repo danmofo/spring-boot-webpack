@@ -23,7 +23,7 @@ cp -r "client/dist/" "dist/static"
 
 # Generate application
 # ./mvnw -f "server/pom.xml" clean package -Dmaven.test.skip=true
-./server/mvnw -f "server/pom.xml" clean package
+mvn -f "server/pom.xml" clean package
 cp -r "server/target/spring-boot-webpack-0.0.1-SNAPSHOT.jar" "dist/"
 
 echo "Application created @ ./dist/"

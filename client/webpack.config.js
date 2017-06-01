@@ -1,27 +1,20 @@
-var webpack = require('webpack');
-var path = require('path');
-var glob = require('glob');
+const webpack = require('webpack');
+const path = require('path');
+const glob = require('glob');
 
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var PurifyCSSPlugin = require('purifycss-webpack');
-var CleanWebpackPlugin = require('clean-webpack-plugin');
-var ManifestPlugin = require('webpack-manifest-plugin');
-var WebpackShellPlugin = require('webpack-shell-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const PurifyCSSPlugin = require('purifycss-webpack');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+const WebpackShellPlugin = require('webpack-shell-plugin');
 
-var inProduction = process.env.NODE_ENV === 'production';
-
-const TARGET = process.env.npm_lifecycle_event;
-const PATHS = {
-    source: path.join(__dirname, 'src/scripts'),
-    output: path.join(__dirname, '../../../target/classes/static'),
-    templates: path.join(__dirname, '../server/target/classes/templates/')
-}
+const inProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
 	entry: {
 		app: [
-		'./src/scripts/main.js',
-		'./src/styles/main.scss'
+		    './src/scripts/main.js',
+		    './src/styles/main.scss'
 		],
 		vendor: 'jquery'
 	},
@@ -54,16 +47,22 @@ module.exports = {
 			},
 			{
 				test: /\.(png|jpg|gif|svg)$/,
-				loaders: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: 'images/[name].[hash].[ext]'
-						}
-					},
-          // todo: make this conditional..
-          // 'img-loader'
-				]
+				loaders: (function() {
+                     let imageLoaders = [
+                         {
+                             loader: 'file-loader',
+                             options: {
+                                 name: 'images/[name].[hash].[ext]'
+                             }
+                         }
+                     ]
+
+                     if(inProduction) {
+                         imageLoaders.push('img-loader');
+                     }
+
+                     return imageLoaders;
+                 })()
 			},
 			{
 				test: /\.(eot|ttf|woff|woff2)$/,
@@ -84,43 +83,46 @@ module.exports = {
 		}),
 		new ExtractTextPlugin({
 			filename: "styles/[name].[hash].css"
-      // filename: "styles/[name].css"
-		}),
-		new PurifyCSSPlugin({
-			paths: glob.sync(PATHS.templates + '*.ftl'),
-			minimize: inProduction
 		}),
 		new webpack.LoaderOptionsPlugin({
 			minimize: inProduction
 		}),
-    new ManifestPlugin({
-      writeToFileEmit: true,
-      basePath: '/',
-      stripSrc: true
-    }),
-    new WebpackShellPlugin({
-      dev: false,
-      // todo: only copy to /resources on build..
-      onBuildEnd: ['cp dist/manifest.json ../server/src/main/resources/',
-                   'cp dist/manifest.json ../server/target/classes/']
-    })
+        new ManifestPlugin({
+            writeToFileEmit: true,
+            basePath: '/',
+            stripSrc: true
+        }),
+        new WebpackShellPlugin({
+            dev: inProduction,
+            onBuildEnd: (function() {
+                let commands = ['cp dist/manifest.json ../server/target/classes/']
+                if(inProduction) {
+                    commands.push('cp dist/manifest.json ../server/src/main/resources/');
+                }
+                return commands;
+            })()
+         })
 	],
-  devServer: {
-      port: 9090,
-      proxy: {
-          '/': {
-              target: 'http://localhost:8080',
-              secure: false,
-              prependPath: false
-          }
-      },
-      publicPath: 'http://localhost:9090/',
-      historyApiFallback: true
-  }
+    devServer: {
+        port: 9090,
+        proxy: {
+            '/': {
+                target: 'http://localhost:8080',
+                secure: false,
+                prependPath: false
+            }
+        },
+        publicPath: 'http://localhost:9090/',
+        historyApiFallback: true
+    }
 }
 
+let plugins = module.exports.plugins;
+
 if(inProduction) {
-	module.exports.plugins.push(
-		new webpack.optimize.UglifyJsPlugin()
-	)
+	plugins.push(new webpack.optimize.UglifyJsPlugin());
+	plugins.push(new PurifyCSSPlugin({
+                 	paths: glob.sync(path.join(__dirname, '../server/target/classes/templates/') + '*.ftl'),
+                 	minimize: true
+                 }));
 }

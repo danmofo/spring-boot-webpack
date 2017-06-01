@@ -1,7 +1,7 @@
 {
-  "name": "webpack-learning",
+  "name": "spring-boot-webpack",
   "version": "1.0.0",
-  "description": "Source: https://laracasts.com/series/webpack-for-everyone/episodes/1",
+  "description": "Spring Boot compatible Webpack project",
   "main": "index.js",
   "scripts": {
     "build": "webpack-dev-server --colors --progress",
@@ -9,8 +9,8 @@
     "watch": "npm run build -- --watch"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Daniel Moffat",
+  "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.24.1",
     "babel-loader": "^7.0.0",
