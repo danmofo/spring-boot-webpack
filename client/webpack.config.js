@@ -116,16 +116,16 @@ module.exports = {
     devServer: {
         port: 9090,
         proxy: [{
-          context: '/',
-          target: 'http://localhost:8080/',
-          secure: false
-        }, {
             context: '/cause/select',
-            target: 'https://www.giveasyoulive.com/cause/select',
+            target: 'https://www.giveasyoulive.com/',
             secure: false,
             bypass: function(req, res, opts) {
                 req.headers.host = 'www.giveasyoulive.com';
             }
+        }, {
+          context: '/',
+          target: 'http://localhost:8080/',
+          secure: false
         }],
         publicPath: 'http://localhost:9090/',
         historyApiFallback: true
